@@ -169,6 +169,28 @@ class XOMTreeBuilder extends CoalescingTreeBuilder<Element> {
         }
     }
 
+ @Override
+ protected Element createMapmlElementSetAsRoot(
+            HtmlAttributes attributes) throws SAXException {
+        try {
+            Element rv = nodeFactory.makeElement("mapml",
+                    "http://www.w3.org/1999/xhtml");
+            for (int i = 0; i < attributes.getLength(); i++) {
+                rv.addAttribute(nodeFactory.makeAttribute(
+                        attributes.getLocalNameNoBoundsCheck(i),
+                        attributes.getURINoBoundsCheck(i),
+                        attributes.getValueNoBoundsCheck(i),
+                        attributes.getTypeNoBoundsCheck(i) == "ID" ? Attribute.Type.ID
+                                : Attribute.Type.CDATA));
+            }
+            document.setRootElement(rv);
+            return rv;
+        } catch (XMLException e) {
+            fatal(e);
+            throw new RuntimeException("Unreachable");
+        }
+    }
+
     @Override
     protected void detachFromParent(Element element) throws SAXException {
         try {

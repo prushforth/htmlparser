@@ -202,6 +202,8 @@ public abstract class TreeBuilder<T> implements TokenHandler,
 
     final static int IMG = 68;
 
+    final static int MAPML = 69;
+
     // start insertion modes
 
     private static final int IN_ROW = 0;
@@ -611,7 +613,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
             if (contextNode != null) {
                 elt = contextNode;
             } else {
-                elt = createHtmlElementSetAsRoot(tokenizer.emptyAttributes());
+                elt = createMapmlElementSetAsRoot(tokenizer.emptyAttributes());
             }
             // When the context node is not in the HTML namespace, contrary
             // to the spec, the first node on the stack is not set to "html"
@@ -1019,7 +1021,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                                      */
                                     // No need to flush characters here,
                                     // because there's nothing to flush.
-                                    appendHtmlElementToDocumentAndPush();
+                                    appendMapmlElementToDocumentAndPush();
                                     /* Switch to the main mode */
                                     mode = BEFORE_HEAD;
                                     /*
@@ -1285,7 +1287,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                      * Create an HTMLElement node with the tag name html, in the
                      * HTML namespace. Append it to the Document object.
                      */
-                    appendHtmlElementToDocumentAndPush();
+                    appendMapmlElementToDocumentAndPush();
                     // XXX application cache manifest
                     /* Switch to the main mode */
                     mode = BEFORE_HEAD;
@@ -1911,6 +1913,13 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                 case IN_BODY:
                     inbodyloop: for (;;) {
                         switch (group) {
+                            case MAPML:
+                                errStrayStartTag(name);
+                                if (!fragment && !isTemplateContents()) {
+                                    addAttributesToHtml(attributes);
+                                    attributes = null; // CPP
+                                }
+                                break starttagloop;
                             case HTML:
                                 errStrayStartTag(name);
                                 if (!fragment && !isTemplateContents()) {
@@ -2614,7 +2623,9 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                     /*
                      * Parse error.
                      */
-                    errStartTagWithoutDoctype();
+                    if (name != "mapml") {
+                      errStartTagWithoutDoctype();
+                    }
                     /*
                      *
                      * Set the document to quirks mode.
@@ -2647,6 +2658,19 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                             // XXX application cache should fire here
                             mode = BEFORE_HEAD;
                             attributes = null; // CPP
+                            break starttagloop;
+                        case MAPML:
+                            /*
+                             * Create an MAPMLElement node with the tag name
+                             * mapml, in the HTML namespace. Append it to the
+                             * Document object.
+                             */
+                            appendMapmlElementToDocumentAndPush();
+                            /* Switch to the main mode */
+                            mode = BEFORE_HEAD;
+                            /*
+                             * reprocess the current token.
+                             */
                             break starttagloop;
                         default:
                             /*
@@ -3768,6 +3792,14 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                                 mode = AFTER_AFTER_BODY;
                                 break endtagloop;
                             }
+                        case MAPML:
+                            if (fragment) {
+                                errStrayEndTag(name);
+                                break endtagloop;
+                            } else {
+                                mode = AFTER_AFTER_BODY;
+                                break endtagloop;
+                            }
                         default:
                             errEndTagAfterBody();
                             mode = framesetOk ? FRAMESET_OK : IN_BODY;
@@ -3829,7 +3861,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                              * html, in the HTML namespace. Append it to the
                              * Document object.
                              */
-                            appendHtmlElementToDocumentAndPush();
+                            appendMapmlElementToDocumentAndPush();
                             /* Switch to the main mode */
                             mode = BEFORE_HEAD;
                             /*
@@ -4271,7 +4303,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                 // TODO: Fragment case. Add error reporting.
                 mode = IN_FRAMESET;
                 return;
-            } else if ("html" == name) {
+            } else if ("html" == name || "mapml" == name) {
                 if (headPointer == null) {
                     // TODO: Fragment case. Add error reporting.
                     mode = BEFORE_HEAD;
@@ -5115,6 +5147,25 @@ public abstract class TreeBuilder<T> implements TokenHandler,
         appendHtmlElementToDocumentAndPush(tokenizer.emptyAttributes());
     }
 
+    private void appendMapmlElementToDocumentAndPush(HtmlAttributes attributes)
+            throws SAXException {
+        // [NOCPP[
+        checkAttributes(attributes, "http://www.w3.org/1999/xhtml");
+        // ]NOCPP]
+        T elt = createMapmlElementSetAsRoot(attributes);
+        StackNode<T> node = createStackNode(ElementName.MAPML,
+                elt
+                // [NOCPP[
+                , errorHandler == null ? null : new TaintableLocatorImpl(tokenizer)
+        // ]NOCPP]
+        );
+        push(node);
+    }
+
+    private void appendMapmlElementToDocumentAndPush() throws SAXException {
+        appendMapmlElementToDocumentAndPush(tokenizer.emptyAttributes());
+    }
+
     private void appendToCurrentNodeAndPushHeadElement(HtmlAttributes attributes)
             throws SAXException {
         // [NOCPP[
@@ -5587,6 +5638,9 @@ public abstract class TreeBuilder<T> implements TokenHandler,
     }
 
     protected abstract T createHtmlElementSetAsRoot(HtmlAttributes attributes)
+            throws SAXException;
+
+    protected abstract T createMapmlElementSetAsRoot(HtmlAttributes attributes)
             throws SAXException;
 
     protected abstract void detachFromParent(T element) throws SAXException;

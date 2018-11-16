@@ -81,6 +81,13 @@ class SAXTreeBuilder extends TreeBuilder<Element> {
     }
 
     @Override
+    protected Element createMapmlElementSetAsRoot(HtmlAttributes attributes) {
+        Element newElt = new Element(tokenizer, "http://www.w3.org/1999/xhtml", "mapml", "mapml", attributes, true, null);
+        document.appendChild(newElt);
+        return newElt;
+    }
+
+    @Override
     protected void addAttributesToElement(Element element, HtmlAttributes attributes) throws SAXException {
         HtmlAttributes existingAttrs = (HtmlAttributes) element.getAttributes();
         existingAttrs.merge(attributes);

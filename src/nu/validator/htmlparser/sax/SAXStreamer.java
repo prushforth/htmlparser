@@ -88,6 +88,11 @@ class SAXStreamer extends TreeBuilder<Attributes>{
     }
 
     @Override
+    protected Attributes createMapmlElementSetAsRoot(HtmlAttributes attributes) throws SAXException {
+        return attributes;
+    }
+
+    @Override
     protected void detachFromParent(Attributes element) throws SAXException {
         fatal();
     }

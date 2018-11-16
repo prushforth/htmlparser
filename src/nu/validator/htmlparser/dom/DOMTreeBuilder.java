@@ -196,6 +196,28 @@ class DOMTreeBuilder extends CoalescingTreeBuilder<Element> {
 
     /**
      * 
+     * @see nu.validator.htmlparser.impl.TreeBuilder#createHtmlElementSetAsRoot(nu.validator.htmlparser.impl.HtmlAttributes)
+     */
+    @Override protected Element createMapmlElementSetAsRoot(
+            HtmlAttributes attributes) throws SAXException {
+        try {
+            Element rv = document.createElementNS(
+                    "http://www.w3.org/1999/xhtml", "html");
+            for (int i = 0; i < attributes.getLength(); i++) {
+                rv.setAttributeNS(attributes.getURINoBoundsCheck(i),
+                        attributes.getLocalNameNoBoundsCheck(i),
+                        attributes.getValueNoBoundsCheck(i));
+            }
+            document.appendChild(rv);
+            return rv;
+        } catch (DOMException e) {
+            fatal(e);
+            throw new RuntimeException("Unreachable");
+        }
+    }
+
+    /**
+     * 
      * @see nu.validator.htmlparser.impl.TreeBuilder#appendElement(java.lang.Object,
      *      java.lang.Object)
      */
