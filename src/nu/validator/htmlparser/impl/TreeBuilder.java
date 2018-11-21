@@ -273,6 +273,11 @@ public abstract class TreeBuilder<T> implements TokenHandler,
     private static final int TEXT = 21;
 
     private static final int IN_TEMPLATE = 22;
+    
+    // fall-through??
+    
+    private static final int BEFORE_MAPML = 23;
+
 
     // start charset states
 
@@ -359,6 +364,8 @@ public abstract class TreeBuilder<T> implements TokenHandler,
     // [NOCPP[
 
     private static final @Local String HTML_LOCAL = "html";
+    
+    private static final @Local String MAPML_LOCAL = "mapml";
 
     // ]NOCPP]
 
@@ -798,7 +805,11 @@ public abstract class TreeBuilder<T> implements TokenHandler,
              * Then, switch to the root element mode of the tree construction
              * stage.
              */
-            mode = BEFORE_HTML;
+            if (name != "mapml") {
+              mode = BEFORE_HTML;
+            } else {
+              mode = BEFORE_MAPML;
+            }
             return;
         }
         /*
@@ -822,6 +833,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
         if (!isInForeign()) {
             switch (mode) {
                 case INITIAL:
+                case BEFORE_MAPML:
                 case BEFORE_HTML:
                 case AFTER_AFTER_BODY:
                 case AFTER_AFTER_FRAMESET:
@@ -910,6 +922,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                              */
                             switch (mode) {
                                 case INITIAL:
+                                case BEFORE_MAPML:
                                 case BEFORE_HTML:
                                 case BEFORE_HEAD:
                                     /*
@@ -1007,9 +1020,26 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                                      * Then, switch to the root element mode of
                                      * the tree construction stage
                                      */
+                                    // FIGURE OUT HOW TO DETERMINE IF IT SHOULD BE BEFORE_MAPML or BEFORE_HTML here
                                     mode = BEFORE_HTML;
                                     /*
                                      * and reprocess the current token.
+                                     */
+                                    i--;
+                                    continue;
+                                case BEFORE_MAPML:
+                                    /*
+                                     * Create an HTMLElement node with the tag
+                                     * name html, in the HTML namespace. Append
+                                     * it to the Document object.
+                                     */
+                                    // No need to flush characters here,
+                                    // because there's nothing to flush.
+                                    appendMapmlElementToDocumentAndPush();
+                                    /* Switch to the main mode */
+                                    mode = BEFORE_HEAD;
+                                    /*
+                                     * reprocess the current token.
                                      */
                                     i--;
                                     continue;
@@ -1021,7 +1051,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                                      */
                                     // No need to flush characters here,
                                     // because there's nothing to flush.
-                                    appendMapmlElementToDocumentAndPush();
+                                    appendHtmlElementToDocumentAndPush();
                                     /* Switch to the main mode */
                                     mode = BEFORE_HEAD;
                                     /*
@@ -1282,12 +1312,25 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                      * and reprocess the current token.
                      */
                     continue;
-                case BEFORE_HTML:
+                case BEFORE_MAPML:
                     /*
                      * Create an HTMLElement node with the tag name html, in the
                      * HTML namespace. Append it to the Document object.
                      */
                     appendMapmlElementToDocumentAndPush();
+                    // XXX application cache manifest
+                    /* Switch to the main mode */
+                    mode = BEFORE_HEAD;
+                    /*
+                     * reprocess the current token.
+                     */
+                    continue;
+                case BEFORE_HTML:
+                    /*
+                     * Create an HTMLElement node with the tag name html, in the
+                     * HTML namespace. Append it to the Document object.
+                     */
+                    appendHtmlElementToDocumentAndPush();
                     // XXX application cache manifest
                     /* Switch to the main mode */
                     mode = BEFORE_HEAD;
@@ -2624,22 +2667,25 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                      * Parse error.
                      */
                     if (name != "mapml") {
-                      errStartTagWithoutDoctype();
+                        errStartTagWithoutDoctype();
+                      /*
+                       *
+                       * Set the document to quirks mode.
+                       */
+                      documentModeInternal(DocumentMode.QUIRKS_MODE, null, null);
+                      /*
+                       * Then, switch to the root element mode of the tree
+                       * construction stage
+                       */
+                      mode = BEFORE_HTML;
+                    } else {
+                      mode = BEFORE_MAPML;
                     }
-                    /*
-                     *
-                     * Set the document to quirks mode.
-                     */
-                    documentModeInternal(DocumentMode.QUIRKS_MODE, null, null);
-                    /*
-                     * Then, switch to the root element mode of the tree
-                     * construction stage
-                     */
-                    mode = BEFORE_HTML;
                     /*
                      * and reprocess the current token.
                      */
                     continue;
+                case BEFORE_MAPML:
                 case BEFORE_HTML:
                     switch (group) {
                         case HTML:
@@ -2688,6 +2734,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                     }
                 case BEFORE_HEAD:
                     switch (group) {
+                        case MAPML:
                         case HTML:
                             errStrayStartTag(name);
                             if (!fragment && !isTemplateContents()) {
@@ -3845,12 +3892,38 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                      * Then, switch to the root element mode of the tree
                      * construction stage
                      */
-                    mode = BEFORE_HTML;
+                    if (name == "mapml") {
+                      mode = BEFORE_MAPML;
+                    } else {
+                      mode = BEFORE_HTML;
+                    }
                     /*
                      * and reprocess the current token.
                      */
                     continue;
                 case BEFORE_HTML:
+                    switch (group) {
+                        case HEAD:
+                        case BR:
+                        case HTML:
+                        case BODY:
+                            /*
+                             * Create an HTMLElement node with the tag name
+                             * html, in the HTML namespace. Append it to the
+                             * Document object.
+                             */
+                            appendHtmlElementToDocumentAndPush();
+                            /* Switch to the main mode */
+                            mode = BEFORE_HEAD;
+                            /*
+                             * reprocess the current token.
+                             */
+                            continue;
+                        default:
+                            errStrayEndTag(name);
+                            break endtagloop;
+                    }
+                case BEFORE_MAPML:
                     switch (group) {
                         case HEAD:
                         case BR:
@@ -4153,7 +4226,7 @@ public abstract class TreeBuilder<T> implements TokenHandler,
         if (forceQuirks) {
             return true;
         }
-        if (name != HTML_LOCAL) {
+        if (name != HTML_LOCAL && name != MAPML_LOCAL) {
             return true;
         }
         if (publicIdentifier != null) {

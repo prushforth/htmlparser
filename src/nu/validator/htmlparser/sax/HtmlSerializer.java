@@ -38,15 +38,15 @@ import org.xml.sax.ext.LexicalHandler;
 
 public class HtmlSerializer implements ContentHandler, LexicalHandler {
 
-    private static final String[] VOID_ELEMENTS = { "area", "base", "basefont",
+    protected static final String[] VOID_ELEMENTS = { "area", "base", "basefont",
             "bgsound", "br", "col", "command", "embed", "frame", "hr", "img",
             "input", "keygen", "link", "meta", "param", "source", "track",
             "wbr" };
 
-    private static final String[] NON_ESCAPING = { "iframe", "noembed",
+    protected static final String[] NON_ESCAPING = { "iframe", "noembed",
             "noframes", "noscript", "plaintext", "script", "style", "xmp" };
 
-    private static Writer wrap(OutputStream out) {
+    protected static Writer wrap(OutputStream out) {
         try {
             return new OutputStreamWriter(out, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -54,11 +54,11 @@ public class HtmlSerializer implements ContentHandler, LexicalHandler {
         }
     }
 
-    private int ignoreLevel = 0;
+    protected int ignoreLevel = 0;
 
-    private int escapeLevel = 0;
+    protected int escapeLevel = 0;
 
-    private final Writer writer;
+    protected final Writer writer;
 
     public HtmlSerializer(OutputStream out) {
         this(wrap(out));

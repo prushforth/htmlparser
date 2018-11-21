@@ -1,0 +1,21 @@
+<mapml>
+  <head>
+    <title>Canada Base Map - Transportation (CBMT)</title>
+    <meta http-equiv="Content-Type" content="text/mapml;projection=OSMTILE"/>
+    <meta charset="utf-8"/>
+    <link rel="license" href="https://www.nrcan.gc.ca/earth-sciences/geography/topographic-information/free-data-geogratis/licence/17285" title="Canada Base Map © Natural Resources Canada"/>
+  </head>
+      <link rel="bar" href="https://example.org/bar">
+      <test>The bar link should get put into the head. This test node should go in the body. Subsequent nodes also will go in the body, according to the algorithm, because this node will signal the beginning of the body.</test>
+    <link rel="next" href="http://example.com/foo">
+  <body>
+    <extent units="OSMTILE" method="GET">
+      <input name="z" type="zoom" value="15" min="0" max="15"/>
+      <input name="y" type="location" units="tilematrix" axis="row" min="0" max="32768"/>
+      <input name="x" type="location" units="tilematrix" axis="column" min="0" max="32768"/>
+      <link rel="tile" tref="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3857/MapServer/tile/{z}/{y}/{x}?m4h=t"/>
+      <link rel="tile" tref="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3857/MapServer/tile/{z}/{y}/{x}?m4h=t"/>
+    </extent>
+    <title>this is not where it should be, but is not a parse error</title>
+  </body>
+</mapml>
