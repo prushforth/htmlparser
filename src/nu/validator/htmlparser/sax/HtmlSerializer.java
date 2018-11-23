@@ -40,7 +40,7 @@ public class HtmlSerializer implements ContentHandler, LexicalHandler {
 
     protected static final String[] VOID_ELEMENTS = { "area", "base", "basefont",
             "bgsound", "br", "col", "command", "embed", "frame", "hr", "img",
-            "input", "keygen", "link", "meta", "param", "source", "track",
+            "input", "keygen", "link", "meta", "param", "source", "tile", "track",
             "wbr" };
 
     protected static final String[] NON_ESCAPING = { "iframe", "noembed",
