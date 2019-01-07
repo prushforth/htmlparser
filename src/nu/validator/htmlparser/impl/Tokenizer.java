@@ -6970,13 +6970,7 @@ public class Tokenizer implements Locator {
         seenDigits = other.seenDigits;
         endTag = other.endTag;
         shouldSuspend = false;
-
-        if (other.doctypeName == null) {
-            doctypeName = null;
-        } else {
-            doctypeName = Portability.newLocalFromLocal(other.doctypeName,
-                    interner);
-        }
+        doctypeName = other.doctypeName;
 
         Portability.releaseString(systemIdentifier);
         if (other.systemIdentifier == null) {
@@ -7001,7 +6995,7 @@ public class Tokenizer implements Locator {
             // In the C++ case, the atoms in the other tokenizer are from a
             // different tokenizer-scoped atom table. Therefore, we have to
             // obtain the correspoding atom from our own atom table.
-            nonInternedTagName.setNameForNonInterned(Portability.newLocalFromLocal(other.tagName.getName(), interner)
+            nonInternedTagName.setNameForNonInterned(other.tagName.getName()
                     // CPPONLY: , other.tagName.isCustom()
                     );
             tagName = nonInternedTagName;
@@ -7018,7 +7012,7 @@ public class Tokenizer implements Locator {
         // CPPONLY:     // In the C++ case, the atoms in the other tokenizer are from a
         // CPPONLY:     // different tokenizer-scoped atom table. Therefore, we have to
         // CPPONLY:     // obtain the correspoding atom from our own atom table.
-        // CPPONLY:     nonInternedAttributeName.setNameForNonInterned(Portability.newLocalFromLocal(other.attributeName.getLocal(AttributeName.HTML), interner));
+        // CPPONLY:     nonInternedAttributeName.setNameForNonInterned(other.attributeName.getLocal(AttributeName.HTML));
         // CPPONLY:     attributeName = nonInternedAttributeName;
         // CPPONLY: }
 
@@ -7026,7 +7020,7 @@ public class Tokenizer implements Locator {
         if (other.attributes == null) {
             attributes = null;
         } else {
-            attributes = other.attributes.cloneAttributes(interner);
+            attributes = other.attributes.cloneAttributes();
         }
     }
 
@@ -7251,8 +7245,9 @@ public class Tokenizer implements Locator {
 
     void destructor() {
         Portability.delete(nonInternedTagName);
-        // CPPONLY: Portability.delete(nonInternedAttributeName);
         nonInternedTagName = null;
+        // CPPONLY: Portability.delete(nonInternedAttributeName);
+        // CPPONLY: nonInternedAttributeName = null;
         // The translator will write refcount tracing stuff here
         Portability.delete(attributes);
         attributes = null;
