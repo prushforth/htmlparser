@@ -1,0 +1,15 @@
+<!DOCTYPE mapml>
+<mapml>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Static MapML with tiles</title>
+    <link rel="license" href="http://open.canada.ca/en/open-government-licence-canada" title="Open Government Licence - Canada"/>
+  </head>
+  <body>
+    <extent units="CBMTILE">
+      <input name="z" type="zoom" value="2" min="0" max="3"/>
+    </extent>
+    <tile row="10" col="10" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t">
+    <image foo="bar" height="600" width="800" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t">
+  </body>
+</mapml>

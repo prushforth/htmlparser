@@ -14,6 +14,9 @@
       <link rel="tile" tref="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_CBCT_GEOM_3857/MapServer/tile/{z}/{y}/{x}?m4h=t"/>
       <link rel="tile" tref="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT_TXT_3857/MapServer/tile/{z}/{y}/{x}?m4h=t"/>
     </extent>
-    <tile row="12" col="15" src="https://example.org/tiles/2/12/15/"/>
+    <tile row=12 col=15 src=https://example.org/tiles/2/12/15//>
+    <tile row=2 col=4 src=https://example.org/tiles/2/2/4/></tile>
+    <tile row=1 col=5 src=https://example.org/tiles/5/1/5/>
+    <tile row=2 col=4 src=https://example.org/tiles/2/2/4/two/>test</tile>
   </body>
 </mapml>
