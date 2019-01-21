@@ -1,0 +1,23 @@
+<!DOCTYPE mapml>
+<mapml>
+  <head>
+    <title>Static MapML with tiles</title>
+    <meta http-equiv="Content-Type" content="text/mapml"/>
+    <meta charset="utf-8"/>
+<!--    <meta name="zoom" content="2"/>
+--><!--    <base href="http://example.org/"/> -->
+    <link rel="license" href="http://open.canada.ca/en/open-government-licence-canada" title="Open Government Licence - Canada"/>
+<!--    <link rel="alternate" tcrs="OSMTILE" href="images_with_time.mapml"/> -->
+<!--    <link rel="legend" href="http://example.org/legend" type="image/png"/> -->
+  </head>
+  <body>
+    <extent units="CBMTILE">
+      <input name="z" type="zoom" value="2" min="0" max="3"/>
+    </extent>
+    <tile row="10" col="10" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t"></tile>
+    <tile row="10" col="11" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/11?m4h=t"></tile>
+    <tile row="10" col="9" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/9?m4h=t"></tile>
+    <tile row="11" col="9" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/11/9?m4h=t"></tile>
+    <tile row="11" col="11" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/11/11?m4h=t"></tile>
+  </body>
+</mapml>

@@ -9,7 +9,7 @@
     <extent units="CBMTILE">
       <input name="z" type="zoom" value="2" min="0" max="3"/>
     </extent>
-    <tile row="10" col="10" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t">
+    <tile row="10" col="10" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t"></tile>
     <image foo="bar" height="600" width="800" src="https://geoappext.nrcan.gc.ca/arcgis/rest/services/BaseMaps/CBMT3978/MapServer/tile/2/10/10?m4h=t">
   </body>
 </mapml>

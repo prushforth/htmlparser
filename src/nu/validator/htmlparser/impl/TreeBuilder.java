@@ -203,8 +203,6 @@ public abstract class TreeBuilder<T> implements TokenHandler,
     final static int IMG = 68;
 
     final static int MAPML = 69;
-    
-    final static int TILE = 70;
 
     // start insertion modes
 
@@ -2180,7 +2178,6 @@ public abstract class TreeBuilder<T> implements TokenHandler,
                                 // FALL THROUGH to PARAM_OR_SOURCE_OR_TRACK
                                 // CPPONLY: MOZ_FALLTHROUGH;
                             // CPPONLY: case MENUITEM:
-                            case TILE:
                             case PARAM_OR_SOURCE_OR_TRACK:
                                 appendVoidElementToCurrentMayFoster(
                                         elementName,
